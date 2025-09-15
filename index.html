@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -296,6 +296,7 @@
                     db = getFirestore(app);
                     auth = getAuth(app);
                     
+                    // Listener de autenticação para garantir que a inicialização foi concluída
                     onAuthStateChanged(auth, async (user) => {
                         if (user) {
                             userId = user.uid;
@@ -317,17 +318,21 @@
         }
 
         // Lógica do botão de palavra secreta
-        secretWordBtn.addEventListener('click', () => {
+        secretWordBtn.addEventListener('click', async () => {
             const enteredWord = secretWordInput.value.trim();
             if (enteredWord === SECRET_WORD) {
-                adminMessage.classList.add('hidden');
-                if (isAuthReady) {
-                    showPage('ordersListPage');
-                    fetchOrders();
-                } else {
-                    adminMessage.innerText = 'Autenticando... tente novamente em instantes.';
-                    adminMessage.classList.remove('hidden');
+                // Se a palavra estiver correta, espera a autenticação
+                adminMessage.innerText = 'Autenticando...';
+                adminMessage.classList.remove('hidden');
+
+                // Loop para esperar a autenticação ficar pronta
+                while (!isAuthReady) {
+                    await new Promise(resolve => setTimeout(resolve, 100)); // Espera 100ms
                 }
+                
+                adminMessage.classList.add('hidden'); // Esconde a mensagem
+                showPage('ordersListPage');
+                fetchOrders();
             } else {
                 adminMessage.innerText = 'Palavra secreta incorreta.';
                 adminMessage.classList.remove('hidden');
