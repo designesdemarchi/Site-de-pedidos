@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -225,7 +225,9 @@
         <!-- Página de Avaliações (escondida por padrão) -->
         <div id="reviewsPage" class="page hidden">
             <h1 class="text-4xl md:text-5xl font-bold text-center text-white mb-8">Avaliações de Clientes</h1>
-            <p id="userIdDisplay" class="text-sm text-gray-500 text-center mb-4"></p>
+            <p id="userIdDisplay" class="text-sm text-gray-500 text-center mb-1">Seu ID de usuário: carregando...</p>
+            <p id="dbStatus" class="text-sm text-gray-500 text-center mb-4">Status do Banco de Dados: Conectando...</p>
+
             <div id="reviewsContainer" class="flex flex-col gap-6">
                 <!-- Avaliações serão carregadas aqui via JavaScript -->
             </div>
@@ -254,7 +256,7 @@
                 </div>
                 <div class="mb-4">
                     <label for="reviewText" class="block text-gray-300 font-semibold mb-2">Sua Avaliação</label>
-                    <textarea id="reviewText" name="reviewText" rows="5" class="w-full bg-zinc-700 border border-zinc-600 rounded-lg py-2 px-4 text-white resize-none focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Compartilhe sua experiência..." required></textarea>
+                    <textarea id="reviewText" name="reviewText" rows="5" class="w-full bg-zinc-700 border border-zinc-600 rounded-lg py-2 px-4 text-white resize-none focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" placeholder="Compartilhe sua experiência..." required></textarea>
                 </div>
                 <div class="flex items-center justify-between">
                     <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
@@ -271,10 +273,10 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, setDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, setLogLevel, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        // Exibe logs de debug do Firebase
-        // setLogLevel('debug'); // Remova ou comente esta linha na produção
+        // Ativa logs de debug do Firebase
+        setLogLevel('debug');
 
         // --- Configuração e inicialização do Firebase ---
         // Variáveis globais fornecidas pelo ambiente
@@ -283,55 +285,56 @@
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         let db, auth;
-        let userId;
+        let userId = null;
+        const dbStatusEl = document.getElementById('dbStatus');
+        const userIdDisplayEl = document.getElementById('userIdDisplay');
 
-        if (Object.keys(firebaseConfig).length > 0) {
-            const app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-
-            // Listener para o estado de autenticação
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    userId = user.uid;
-                    document.getElementById('userIdDisplay').textContent = `Seu ID de usuário: ${userId}`;
-                    setupRealtimeReviews();
-                } else {
-                    userId = crypto.randomUUID();
-                    await signInAnonymously(auth);
+        // Inicializa o Firebase e a Autenticação
+        const initFirebase = async () => {
+            if (Object.keys(firebaseConfig).length > 0) {
+                try {
+                    const app = initializeApp(firebaseConfig);
+                    auth = getAuth(app);
+                    db = getFirestore(app);
+                    
+                    // Listener para o estado de autenticação
+                    onAuthStateChanged(auth, async (user) => {
+                        if (user) {
+                            userId = user.uid;
+                            dbStatusEl.textContent = 'Status do Banco de Dados: Conectado!';
+                            userIdDisplayEl.textContent = `Seu ID de usuário: ${userId}`;
+                            setupRealtimeReviews();
+                        } else {
+                            // Se não houver token, autentica anonimamente
+                            if (initialAuthToken) {
+                                await signInWithCustomToken(auth, initialAuthToken);
+                                console.log("Autenticação com token personalizado bem-sucedida.");
+                            } else {
+                                await signInAnonymously(auth);
+                                console.log("Autenticação anônima bem-sucedida.");
+                            }
+                        }
+                    });
+                } catch (error) {
+                    console.error("Erro ao inicializar Firebase:", error);
+                    dbStatusEl.textContent = 'Status do Banco de Dados: Erro de conexão!';
                 }
-            });
-
-            // Autentica o usuário com o token personalizado ou anonimamente
-            const authenticate = async () => {
-                if (initialAuthToken) {
-                    try {
-                        await signInWithCustomToken(auth, initialAuthToken);
-                        console.log("Autenticação com token personalizado bem-sucedida.");
-                    } catch (error) {
-                        console.error("Erro ao autenticar com token personalizado:", error);
-                        await signInAnonymously(auth);
-                    }
-                } else {
-                    await signInAnonymously(auth);
-                }
-            };
-            authenticate();
-        } else {
-            console.error("Firebase config não fornecido. O banco de dados não funcionará.");
-        }
+            } else {
+                dbStatusEl.textContent = 'Status do Banco de Dados: Configuração não encontrada!';
+                console.error("Firebase config não fornecido. O banco de dados não funcionará.");
+            }
+        };
 
         // --- Funções do banco de dados ---
         function setupRealtimeReviews() {
-            if (!db) {
-                console.error("Firestore não inicializado.");
+            if (!db || !userId) {
+                console.log("Firestore ou ID de utilizador não estão prontos. A aguardar...");
                 return;
             }
 
             const reviewsCollectionPath = `/artifacts/${appId}/public/data/reviews`;
             const q = query(collection(db, reviewsCollectionPath));
             
-            // Listener em tempo real para as avaliações
             onSnapshot(q, (querySnapshot) => {
                 const reviewsContainer = document.getElementById('reviewsContainer');
                 reviewsContainer.innerHTML = ''; // Limpa o container
@@ -353,8 +356,8 @@
         }
         
         async function saveReview(name, text) {
-            if (!db) {
-                console.error("Firestore não inicializado.");
+            if (!db || !userId) {
+                console.error("Firestore ou ID de utilizador não estão prontos. A submeter avaliação falhou.");
                 return;
             }
             try {
@@ -362,7 +365,7 @@
                 await addDoc(collection(db, reviewsCollectionPath), {
                     name: name,
                     text: text,
-                    timestamp: new Date()
+                    timestamp: serverTimestamp()
                 });
                 console.log("Avaliação salva com sucesso!");
             } catch (e) {
@@ -378,11 +381,11 @@
                         <div>
                             <p class="font-semibold text-white">${name}</p>
                             <div class="flex text-yellow-400">
-                                <!-- Estrelas fixas, para um sistema de avaliação mais complexo seria necessário adicionar a lógica aqui. -->
+                                <!-- As estrelas são visuais e estáticas, não representam uma nota real. -->
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.698h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.698l1.07-3.292z" /></svg>
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.698h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.698l1.07-3.292z" /></svg>
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.698h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.698l1.07-3.292z" /></svg>
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00-.95.698h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.698l1.07-3.292z" /></svg>
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.698h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.698l1.07-3.292z" /></svg>
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.698h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.698l1.07-3.292z" /></svg>
                             </div>
                         </div>
@@ -457,6 +460,9 @@
                 arrowIcon.classList.toggle('rotate-90');
             }
         });
+        
+        // Inicia a inicialização do Firebase quando a página carregar
+        window.onload = initFirebase;
     </script>
 </body>
 </html>
