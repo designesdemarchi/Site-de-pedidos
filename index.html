@@ -36,9 +36,6 @@
                     <button id="enterBtn" class="bg-white hover:bg-gray-200 text-black font-bold py-3 px-8 rounded-full shadow-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                         Entrar no Site
                     </button>
-                    <button id="adminBtn" class="bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-500">
-                        Área Secreta
-                    </button>
                 </div>
             </div>
         </div>
@@ -204,284 +201,27 @@
                 </div>
             </div>
 
-            <!-- Botão para a página de pedido -->
+            <!-- Botão para o Instagram -->
             <div class="flex justify-center">
-                <button id="orderBtn" class="bg-white hover:bg-gray-200 text-black font-bold py-3 px-8 rounded-full shadow-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        Fazer Pedido
-                </button>
-            </div>
-        </div>
-
-        <!-- Página de Pedido (escondida por padrão) -->
-        <div id="orderpage" class="page hidden">
-            <h1 class="text-4xl md:text-5xl font-bold text-center text-white mb-8">Faça o seu Pedido</h1>
-            
-            <form id="orderForm" class="bg-zinc-800 rounded-xl p-6 shadow-md">
-                <div class="mb-6">
-                    <label for="email" class="block text-gray-300 font-semibold mb-2">Seu Email:</label>
-                    <input type="email" id="email" name="email" class="w-full p-4 rounded-lg bg-zinc-900 text-gray-200 border border-zinc-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all" placeholder="seu-email@exemplo.com" required>
-                </div>
-                <div class="mb-6">
-                    <label for="message" class="block text-gray-300 font-semibold mb-2">Descreva seu pedido:</label>
-                    <textarea id="message" name="message" rows="5" class="w-full p-4 rounded-lg bg-zinc-900 text-gray-200 border border-zinc-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all resize-none" placeholder="Ex: Tire aquela pessoa da minha imagem."></textarea>
-                </div>
-
-                <div class="mb-6">
-                    <label for="photos" class="block text-gray-300 font-semibold mb-2">Anexar Fotos:</label>
-                    <input type="file" id="photos" name="photos" multiple class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-white file:text-black hover:file:bg-gray-100 cursor-pointer">
-                </div>
-                
-                <div id="orderStatusMessage" class="text-center text-green-500 mb-4 hidden">Pedido enviado com sucesso!</div>
-
-                <div class="flex flex-col sm:flex-row gap-4 justify-between items-center mt-8">
-                    <button type="button" id="backBtn" class="w-full sm:w-auto bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-full shadow-md transition-colors duration-300">
-                        Voltar
-                    </button>
-                    <button type="submit" id="submitBtn" class="w-full sm:w-auto bg-zinc-900 hover:bg-zinc-800 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        Enviar Pedido
-                    </button>
-                </div>
-            </form>
-        </div>
-
-        <!-- Página de Login Admin (escondida por padrão) -->
-        <div id="adminPage" class="page hidden">
-            <h1 class="text-4xl md:text-5xl font-bold text-center text-white mb-8">Área Secreta</h1>
-            <div class="bg-zinc-800 rounded-xl p-6 shadow-md">
-                <p class="text-gray-400 text-center mb-4">Insira a palavra secreta para ver os pedidos.</p>
-                <div class="flex flex-col sm:flex-row gap-4 items-center">
-                    <input type="password" id="secretWordInput" class="w-full p-4 rounded-lg bg-zinc-900 text-gray-200 border border-zinc-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all" placeholder="Palavra Secreta">
-                    <button id="secretWordBtn" class="w-full sm:w-auto bg-zinc-900 hover:bg-zinc-800 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        Entrar
-                    </button>
-                </div>
-                <p id="adminMessage" class="text-center text-red-500 mt-4 hidden">Palavra secreta incorreta.</p>
-            </div>
-            <div class="flex justify-center mt-6">
-                 <button type="button" id="adminBackBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-full shadow-md transition-colors duration-300">
-                    Voltar
-                </button>
-            </div>
-        </div>
-
-        <!-- Página de Listagem de Pedidos (escondida por padrão) -->
-        <div id="ordersListPage" class="page hidden">
-            <h1 class="text-4xl md:text-5xl font-bold text-center text-white mb-8">Pedidos Recebidos</h1>
-            <div id="ordersList" class="space-y-4">
-                <!-- Pedidos serão injetados aqui via JavaScript -->
-            </div>
-            <p id="loadingMessage" class="text-center text-gray-400 mt-4">Carregando pedidos...</p>
-             <div class="flex justify-center mt-6">
-                 <button type="button" id="ordersListBackBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-full shadow-md transition-colors duration-300">
-                    Voltar
-                </button>
+                <a href="https://www.instagram.com/direct/t/17848804151673656/" target="_blank" class="bg-white hover:bg-gray-200 text-black font-bold py-3 px-8 rounded-full shadow-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Fazer Pedido
+                </a>
             </div>
         </div>
     </div>
 
-    <!-- Firebase SDKs - Importação -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-
-        // Variáveis globais de configuração do Firebase
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        let db, auth;
-        let userId;
-
-        // Ativa o log para ver o que está acontecendo no console
-        setLogLevel('debug');
-
-        // Referências aos elementos HTML
+    <script>
         const welcomePage = document.getElementById('welcomePage');
         const servicesPage = document.getElementById('servicesPage');
-        const orderpage = document.getElementById('orderpage');
-        const adminPage = document.getElementById('adminPage');
-        const ordersListPage = document.getElementById('ordersListPage');
-        
         const enterBtn = document.getElementById('enterBtn');
-        const adminBtn = document.getElementById('adminBtn');
-        const orderBtn = document.getElementById('orderBtn');
-        const backBtn = document.getElementById('backBtn');
-        const adminBackBtn = document.getElementById('adminBackBtn');
-        const ordersListBackBtn = document.getElementById('ordersListBackBtn');
-        const orderForm = document.getElementById('orderForm');
-        const orderStatusMessage = document.getElementById('orderStatusMessage');
-        const secretWordInput = document.getElementById('secretWordInput');
-        const secretWordBtn = document.getElementById('secretWordBtn');
-        const adminMessage = document.getElementById('adminMessage');
-        const ordersList = document.getElementById('ordersList');
-        const loadingMessage = document.getElementById('loadingMessage');
         const servicesTable = document.getElementById('servicesTable');
 
-        // Palavra secreta para a área de admin
-        const SECRET_WORD = 'arthur';
-        
-        // Estado da autenticação
-        let isAuthReady = false;
-
-        // Função para mostrar uma página e esconder as outras
-        function showPage(pageId) {
-            const pages = [welcomePage, servicesPage, orderpage, adminPage, ordersListPage];
-            pages.forEach(page => {
-                if (page.id === pageId) {
-                    page.classList.remove('hidden');
-                } else {
-                    page.classList.add('hidden');
-                }
-            });
-        }
-
-        // --- Navegação entre páginas ---
-        enterBtn.addEventListener('click', () => showPage('servicesPage'));
-        orderBtn.addEventListener('click', () => showPage('orderpage'));
-        backBtn.addEventListener('click', () => showPage('servicesPage'));
-        adminBtn.addEventListener('click', () => showPage('adminPage'));
-        adminBackBtn.addEventListener('click', () => showPage('welcomePage'));
-        ordersListBackBtn.addEventListener('click', () => showPage('adminPage'));
-
-        // --- Lógica do Admin e do Banco de Dados ---
-        
-        // Inicializa o Firebase
-        function initializeFirebase() {
-            try {
-                if (firebaseConfig) {
-                    const app = initializeApp(firebaseConfig);
-                    db = getFirestore(app);
-                    auth = getAuth(app);
-                    
-                    // Listener de autenticação para garantir que a inicialização foi concluída
-                    onAuthStateChanged(auth, async (user) => {
-                        if (user) {
-                            userId = user.uid;
-                        } else {
-                            try {
-                                await signInAnonymously(auth);
-                            } catch (e) {
-                                console.error("Erro ao fazer login anônimo:", e);
-                            }
-                        }
-                        isAuthReady = true;
-                    });
-
-                    // Tenta o login com o token personalizado se ele existir
-                    if (initialAuthToken) {
-                        signInWithCustomToken(auth, initialAuthToken).catch(error => {
-                            console.error("Erro ao autenticar com token personalizado, tentando login anônimo:", error);
-                            signInAnonymously(auth);
-                        });
-                    } else {
-                        // Se não houver token, faz login anónimo
-                        signInAnonymously(auth);
-                    }
-                } else {
-                    console.error("Firebase config is not available.");
-                }
-            } catch (e) {
-                console.error("Error initializing Firebase:", e);
-            }
-        }
-
-        // Lógica do botão de palavra secreta
-        secretWordBtn.addEventListener('click', () => {
-            const enteredWord = secretWordInput.value.trim();
-            if (enteredWord === SECRET_WORD) {
-                if (isAuthReady) {
-                    adminMessage.classList.add('hidden');
-                    showPage('ordersListPage');
-                    fetchOrders();
-                } else {
-                    // Esta mensagem agora é apenas um aviso rápido
-                    adminMessage.innerText = 'Autenticando... Por favor, tente novamente em instantes.';
-                    adminMessage.classList.remove('hidden');
-                }
-            } else {
-                adminMessage.innerText = 'Palavra secreta incorreta.';
-                adminMessage.classList.remove('hidden');
-            }
+        // Mostra a página de serviços quando o botão "Entrar" é clicado
+        enterBtn.addEventListener('click', () => {
+            welcomePage.classList.add('hidden');
+            servicesPage.classList.remove('hidden');
         });
-        
-        // Função para buscar pedidos do Firestore em tempo real
-        function fetchOrders() {
-            if (!db || !isAuthReady) {
-                console.warn("Firestore não está pronto para buscar pedidos.");
-                return;
-            }
-            loadingMessage.classList.remove('hidden');
-            ordersList.innerHTML = '';
-            
-            const ordersCollection = collection(db, `artifacts/${appId}/public/data/orders`);
-            const q = query(ordersCollection);
 
-            onSnapshot(q, (snapshot) => {
-                loadingMessage.classList.add('hidden');
-                if (snapshot.empty) {
-                    ordersList.innerHTML = '<p class="text-center text-gray-500">Nenhum pedido encontrado ainda.</p>';
-                    return;
-                }
-                
-                ordersList.innerHTML = ''; // Limpa a lista antes de renderizar
-                
-                snapshot.forEach((doc) => {
-                    const order = doc.data();
-                    const orderItem = document.createElement('div');
-                    orderItem.className = 'bg-zinc-700 rounded-lg p-4 shadow-md';
-                    
-                    const timestamp = order.timestamp ? new Date(order.timestamp).toLocaleString('pt-BR') : 'Data não disponível';
-                    
-                    orderItem.innerHTML = `
-                        <h3 class="font-bold text-white mb-2">Pedido de ${order.email}</h3>
-                        <p class="text-gray-300 text-sm mb-2">Data: ${timestamp}</p>
-                        <p class="text-gray-400">${order.message}</p>
-                    `;
-                    ordersList.appendChild(orderItem);
-                });
-            }, (error) => {
-                console.error("Erro ao buscar pedidos:", error);
-                loadingMessage.innerText = 'Erro ao carregar pedidos.';
-            });
-        }
-
-        // Lógica para salvar o pedido no Firestore
-        orderForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const email = document.getElementById('email').value;
-            const message = document.getElementById('message').value;
-
-            if (!db || !email || !message) {
-                orderStatusMessage.innerText = 'Preencha todos os campos obrigatórios.';
-                orderStatusMessage.classList.remove('hidden');
-                return;
-            }
-
-            try {
-                // Adiciona o pedido ao banco de dados
-                await addDoc(collection(db, `artifacts/${appId}/public/data/orders`), {
-                    email: email,
-                    message: message,
-                    timestamp: new Date().toISOString() // Salva a data para ordenação
-                });
-                
-                orderStatusMessage.innerText = 'Pedido enviado com sucesso!';
-                orderStatusMessage.classList.remove('hidden');
-                orderStatusMessage.classList.add('text-green-500');
-                orderForm.reset();
-                console.log("Pedido salvo com sucesso!");
-
-            } catch (e) {
-                console.error("Erro ao adicionar documento:", e);
-                orderStatusMessage.innerText = 'Erro ao enviar pedido. Tente novamente.';
-                orderStatusMessage.classList.remove('hidden');
-                orderStatusMessage.classList.add('text-red-500');
-            }
-        });
-        
         // Lógica de expansão da tabela de serviços
         servicesTable.addEventListener('click', (e) => {
             const row = e.target.closest('tr[data-target]');
@@ -496,9 +236,6 @@
                 arrowIcon.classList.toggle('rotate-90');
             }
         });
-
-        // Inicia o Firebase no carregamento da página
-        window.onload = initializeFirebase;
     </script>
 </body>
 </html>
