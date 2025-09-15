@@ -18,6 +18,15 @@
         .rotate-90 {
             transform: rotate(90deg);
         }
+        .star-rating .star {
+            color: #d1d5db; /* Cor das estrelas vazias */
+            font-size: 2.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .star-rating .star.filled {
+            color: #facc15; /* Cor das estrelas preenchidas */
+        }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
@@ -254,6 +263,16 @@
                     <label for="reviewName" class="block text-gray-300 font-semibold mb-2">Seu Nome</label>
                     <input type="text" id="reviewName" name="reviewName" class="w-full bg-zinc-700 border border-zinc-600 rounded-lg py-2 px-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Seu nome ou apelido" required>
                 </div>
+                <div class="mb-4 text-center">
+                    <label class="block text-gray-300 font-semibold mb-2">Sua Nota:</label>
+                    <div id="star-rating" class="star-rating inline-flex gap-1">
+                        <span class="star" data-rating="1">&#9733;</span>
+                        <span class="star" data-rating="2">&#9733;</span>
+                        <span class="star" data-rating="3">&#9733;</span>
+                        <span class="star" data-rating="4">&#9733;</span>
+                        <span class="star" data-rating="5">&#9733;</span>
+                    </div>
+                </div>
                 <div class="mb-4">
                     <label for="reviewText" class="block text-gray-300 font-semibold mb-2">Sua Avaliação</label>
                     <textarea id="reviewText" name="reviewText" rows="5" class="w-full bg-zinc-700 border border-zinc-600 rounded-lg py-2 px-4 text-white resize-none focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" placeholder="Compartilhe sua experiência..." required></textarea>
@@ -286,8 +305,11 @@
 
         let db, auth;
         let userId = null;
+        let currentRating = 0; // Para a funcionalidade de estrelas
         const dbStatusEl = document.getElementById('dbStatus');
         const userIdDisplayEl = document.getElementById('userIdDisplay');
+        const starRatingContainer = document.getElementById('star-rating');
+        const stars = document.querySelectorAll('.star-rating .star');
 
         // Inicializa o Firebase e a Autenticação
         const initFirebase = async () => {
@@ -346,7 +368,7 @@
                     noReviewsMessage.classList.add('hidden');
                     querySnapshot.forEach((doc) => {
                         const reviewData = doc.data();
-                        const reviewHtml = createReviewElement(reviewData.name, reviewData.text);
+                        const reviewHtml = createReviewElement(reviewData.name, reviewData.text, reviewData.rating);
                         reviewsContainer.innerHTML += reviewHtml;
                     });
                 }
@@ -355,7 +377,7 @@
             });
         }
         
-        async function saveReview(name, text) {
+        async function saveReview(name, text, rating) {
             if (!db || !userId) {
                 console.error("Firestore ou ID de utilizador não estão prontos. A submeter avaliação falhou.");
                 return;
@@ -365,6 +387,7 @@
                 await addDoc(collection(db, reviewsCollectionPath), {
                     name: name,
                     text: text,
+                    rating: rating,
                     timestamp: serverTimestamp()
                 });
                 console.log("Avaliação salva com sucesso!");
@@ -373,7 +396,11 @@
             }
         }
 
-        function createReviewElement(name, text) {
+        function createReviewElement(name, text, rating) {
+            // Gera as estrelas com base na nota
+            const fullStars = '&#9733;'.repeat(rating);
+            const emptyStars = '&#9734;'.repeat(5 - rating);
+            
             return `
                 <div class="bg-zinc-800 rounded-xl p-6 shadow-md">
                     <div class="flex items-center mb-4">
@@ -381,12 +408,8 @@
                         <div>
                             <p class="font-semibold text-white">${name}</p>
                             <div class="flex text-yellow-400">
-                                <!-- As estrelas são visuais e estáticas, não representam uma nota real. -->
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.698h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.698l1.07-3.292z" /></svg>
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.698h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.698l1.07-3.292z" /></svg>
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.698h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.698l1.07-3.292z" /></svg>
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.698h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.698l1.07-3.292z" /></svg>
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.698h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.698l1.07-3.292z" /></svg>
+                                ${fullStars}
+                                <span class="text-gray-400">${emptyStars}</span>
                             </div>
                         </div>
                     </div>
@@ -395,7 +418,7 @@
             `;
         }
 
-        // --- Lógica de navegação de páginas ---
+        // --- Lógica de navegação de páginas e funcionalidade de estrelas ---
         const welcomePage = document.getElementById('welcomePage');
         const servicesPage = document.getElementById('servicesPage');
         const reviewsPage = document.getElementById('reviewsPage');
@@ -408,6 +431,39 @@
         const leaveReviewBtn = document.getElementById('leaveReviewBtn');
         const backFromFormBtn = document.getElementById('backFromFormBtn');
         const reviewForm = document.getElementById('reviewForm');
+        
+        // Função para renderizar as estrelas com base na nota
+        const renderStars = (rating) => {
+            stars.forEach(star => {
+                const starValue = parseInt(star.dataset.rating);
+                if (starValue <= rating) {
+                    star.classList.add('filled');
+                } else {
+                    star.classList.remove('filled');
+                }
+            });
+        };
+
+        // Eventos de mouse para selecionar as estrelas
+        if (starRatingContainer) {
+            starRatingContainer.addEventListener('mouseover', (e) => {
+                if (e.target.classList.contains('star')) {
+                    const rating = parseInt(e.target.dataset.rating);
+                    renderStars(rating);
+                }
+            });
+
+            starRatingContainer.addEventListener('mouseout', () => {
+                renderStars(currentRating);
+            });
+
+            starRatingContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('star')) {
+                    currentRating = parseInt(e.target.dataset.rating);
+                    renderStars(currentRating);
+                }
+            });
+        }
 
         enterBtn.addEventListener('click', () => {
             welcomePage.classList.add('hidden');
@@ -439,12 +495,35 @@
 
         reviewForm.addEventListener('submit', (e) => {
             e.preventDefault();
+            
+            if (currentRating === 0) {
+                const message = 'Por favor, selecione uma nota antes de enviar.';
+                console.error(message);
+                const reviewsContainer = document.getElementById('reviewsContainer');
+                
+                const errorMessageDiv = document.createElement('div');
+                errorMessageDiv.classList.add('text-red-500', 'text-sm', 'mt-2', 'text-center');
+                errorMessageDiv.textContent = message;
+                
+                // Adiciona a mensagem de erro temporariamente
+                const formContainer = reviewForm.closest('.page');
+                formContainer.appendChild(errorMessageDiv);
+                
+                setTimeout(() => {
+                    errorMessageDiv.remove();
+                }, 3000);
+                
+                return;
+            }
+
             const name = document.getElementById('reviewName').value;
             const review = document.getElementById('reviewText').value;
 
             if (name && review) {
-                saveReview(name, review);
+                saveReview(name, review, currentRating);
                 reviewForm.reset();
+                currentRating = 0;
+                renderStars(0);
                 reviewFormPage.classList.add('hidden');
                 reviewsPage.classList.remove('hidden');
             }
