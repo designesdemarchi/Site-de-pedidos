@@ -417,6 +417,9 @@
         reviewsBtn.addEventListener('click', () => {
             servicesPage.classList.add('hidden');
             reviewsPage.classList.remove('hidden');
+            // Re-hide a mensagem de "sem avaliações" quando o usuário volta para a página de avaliações.
+            document.getElementById('noReviewsMessage').classList.add('hidden');
+            setupRealtimeReviews();
         });
 
         leaveReviewBtn.addEventListener('click', () => {
