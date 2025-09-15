@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -25,16 +25,21 @@
     <!-- Container Principal do App -->
     <div class="bg-zinc-950 rounded-3xl shadow-2xl p-6 md:p-10 max-w-5xl w-full">
 
-        <!-- Nova Página de Boas-Vindas (visível por padrão) -->
+        <!-- Página de Boas-Vindas (visível por padrão) -->
         <div id="welcomePage" class="page">
             <div class="flex flex-col items-center justify-center text-center h-[50vh] md:h-[60vh]">
                 <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">Bem-vindo(a)</h1>
                 <p class="text-gray-400 text-lg mb-8">
                     Personalize suas fotos com a nossa ajuda.
                 </p>
-                <button id="enterBtn" class="bg-white hover:bg-gray-200 text-black font-bold py-3 px-8 rounded-full shadow-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    Entrar no Site
-                </button>
+                <div class="flex flex-col md:flex-row gap-4 mb-8 w-full justify-center px-4">
+                    <button id="enterBtn" class="bg-white hover:bg-gray-200 text-black font-bold py-3 px-8 rounded-full shadow-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Entrar no Site
+                    </button>
+                    <button id="adminBtn" class="bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-500">
+                        Área Secreta
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -153,7 +158,7 @@
         <div id="orderpage" class="page hidden">
             <h1 class="text-4xl md:text-5xl font-bold text-center text-white mb-8">Faça o seu Pedido</h1>
             
-            <form action="https://formspree.io/f/f/arthurpedemeia@gmail.com" method="POST" class="bg-zinc-800 rounded-xl p-6 shadow-md">
+            <form id="orderForm" class="bg-zinc-800 rounded-xl p-6 shadow-md">
                 <div class="mb-6">
                     <label for="email" class="block text-gray-300 font-semibold mb-2">Seu Email:</label>
                     <input type="email" id="email" name="email" class="w-full p-4 rounded-lg bg-zinc-900 text-gray-200 border border-zinc-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all" placeholder="seu-email@exemplo.com" required>
@@ -167,6 +172,8 @@
                     <label for="photos" class="block text-gray-300 font-semibold mb-2">Anexar Fotos:</label>
                     <input type="file" id="photos" name="photos" multiple class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-white file:text-black hover:file:bg-gray-100 cursor-pointer">
                 </div>
+                
+                <div id="orderStatusMessage" class="text-center text-green-500 mb-4 hidden">Pedido enviado com sucesso!</div>
 
                 <div class="flex flex-col sm:flex-row gap-4 justify-between items-center mt-8">
                     <button type="button" id="backBtn" class="w-full sm:w-auto bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-full shadow-md transition-colors duration-300">
@@ -178,37 +185,231 @@
                 </div>
             </form>
         </div>
+
+        <!-- Página de Login Admin (escondida por padrão) -->
+        <div id="adminPage" class="page hidden">
+            <h1 class="text-4xl md:text-5xl font-bold text-center text-white mb-8">Área Secreta</h1>
+            <div class="bg-zinc-800 rounded-xl p-6 shadow-md">
+                <p class="text-gray-400 text-center mb-4">Insira a palavra secreta para ver os pedidos.</p>
+                <div class="flex flex-col sm:flex-row gap-4 items-center">
+                    <input type="password" id="secretWordInput" class="w-full p-4 rounded-lg bg-zinc-900 text-gray-200 border border-zinc-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all" placeholder="Palavra Secreta">
+                    <button id="secretWordBtn" class="w-full sm:w-auto bg-zinc-900 hover:bg-zinc-800 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Entrar
+                    </button>
+                </div>
+                <p id="adminMessage" class="text-center text-red-500 mt-4 hidden">Palavra secreta incorreta.</p>
+            </div>
+            <div class="flex justify-center mt-6">
+                 <button type="button" id="adminBackBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-full shadow-md transition-colors duration-300">
+                    Voltar
+                </button>
+            </div>
+        </div>
+
+        <!-- Página de Listagem de Pedidos (escondida por padrão) -->
+        <div id="ordersListPage" class="page hidden">
+            <h1 class="text-4xl md:text-5xl font-bold text-center text-white mb-8">Pedidos Recebidos</h1>
+            <div id="ordersList" class="space-y-4">
+                <!-- Pedidos serão injetados aqui via JavaScript -->
+            </div>
+            <p id="loadingMessage" class="text-center text-gray-400 mt-4">Carregando pedidos...</p>
+             <div class="flex justify-center mt-6">
+                 <button type="button" id="ordersListBackBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-full shadow-md transition-colors duration-300">
+                    Voltar
+                </button>
+            </div>
+        </div>
     </div>
 
-    <script>
-        // Obtém as referências dos elementos
+    <!-- Firebase SDKs - Importação -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+
+        // Variáveis globais de configuração do Firebase
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let db, auth;
+        let userId;
+
+        // Ativa o log para ver o que está acontecendo no console
+        setLogLevel('debug');
+
+        // Referências aos elementos HTML
         const welcomePage = document.getElementById('welcomePage');
         const servicesPage = document.getElementById('servicesPage');
         const orderpage = document.getElementById('orderpage');
+        const adminPage = document.getElementById('adminPage');
+        const ordersListPage = document.getElementById('ordersListPage');
+        
         const enterBtn = document.getElementById('enterBtn');
+        const adminBtn = document.getElementById('adminBtn');
         const orderBtn = document.getElementById('orderBtn');
         const backBtn = document.getElementById('backBtn');
+        const adminBackBtn = document.getElementById('adminBackBtn');
+        const ordersListBackBtn = document.getElementById('ordersListBackBtn');
+        const orderForm = document.getElementById('orderForm');
+        const orderStatusMessage = document.getElementById('orderStatusMessage');
+        const secretWordInput = document.getElementById('secretWordInput');
+        const secretWordBtn = document.getElementById('secretWordBtn');
+        const adminMessage = document.getElementById('adminMessage');
+        const ordersList = document.getElementById('ordersList');
+        const loadingMessage = document.getElementById('loadingMessage');
         const servicesTable = document.getElementById('servicesTable');
 
-        // Navegação entre páginas
-        enterBtn.addEventListener('click', () => {
-            welcomePage.classList.add('hidden');
-            servicesPage.classList.remove('hidden');
-        });
+        // Palavra secreta para a área de admin
+        const SECRET_WORD = 'design2025';
 
-        orderBtn.addEventListener('click', () => {
-            servicesPage.classList.add('hidden');
-            orderpage.classList.remove('hidden');
-        });
+        // Função para mostrar uma página e esconder as outras
+        function showPage(pageId) {
+            const pages = [welcomePage, servicesPage, orderpage, adminPage, ordersListPage];
+            pages.forEach(page => {
+                if (page.id === pageId) {
+                    page.classList.remove('hidden');
+                } else {
+                    page.classList.add('hidden');
+                }
+            });
+        }
 
-        backBtn.addEventListener('click', () => {
-            orderpage.classList.add('hidden');
-            servicesPage.classList.remove('hidden');
-            // Limpa o formulário ao voltar
-            const orderForm = document.querySelector('#orderpage form');
-            orderForm.reset();
-        });
+        // --- Navegação entre páginas ---
+        enterBtn.addEventListener('click', () => showPage('servicesPage'));
+        orderBtn.addEventListener('click', () => showPage('orderpage'));
+        backBtn.addEventListener('click', () => showPage('servicesPage'));
+        adminBtn.addEventListener('click', () => showPage('adminPage'));
+        adminBackBtn.addEventListener('click', () => showPage('welcomePage'));
+        ordersListBackBtn.addEventListener('click', () => showPage('adminPage'));
 
+        // --- Lógica do Admin e do Banco de Dados ---
+        
+        let isAuthReady = false;
+
+        // Inicializa o Firebase
+        function initializeFirebase() {
+            try {
+                if (firebaseConfig) {
+                    const app = initializeApp(firebaseConfig);
+                    db = getFirestore(app);
+                    auth = getAuth(app);
+                    
+                    onAuthStateChanged(auth, async (user) => {
+                        if (user) {
+                            userId = user.uid;
+                        } else {
+                            try {
+                                await signInAnonymously(auth);
+                            } catch (e) {
+                                console.error("Erro ao fazer login anônimo:", e);
+                            }
+                        }
+                        isAuthReady = true;
+                    });
+                } else {
+                    console.error("Firebase config is not available.");
+                }
+            } catch (e) {
+                console.error("Error initializing Firebase:", e);
+            }
+        }
+
+        // Lógica do botão de palavra secreta
+        secretWordBtn.addEventListener('click', () => {
+            const enteredWord = secretWordInput.value.trim();
+            if (enteredWord === SECRET_WORD) {
+                adminMessage.classList.add('hidden');
+                if (isAuthReady) {
+                    showPage('ordersListPage');
+                    fetchOrders();
+                } else {
+                    adminMessage.innerText = 'Autenticando... tente novamente em instantes.';
+                    adminMessage.classList.remove('hidden');
+                }
+            } else {
+                adminMessage.innerText = 'Palavra secreta incorreta.';
+                adminMessage.classList.remove('hidden');
+            }
+        });
+        
+        // Função para buscar pedidos do Firestore em tempo real
+        function fetchOrders() {
+            if (!db || !isAuthReady) {
+                console.warn("Firestore não está pronto para buscar pedidos.");
+                return;
+            }
+            loadingMessage.classList.remove('hidden');
+            ordersList.innerHTML = '';
+            
+            const ordersCollection = collection(db, `artifacts/${appId}/public/data/orders`);
+            const q = query(ordersCollection);
+
+            onSnapshot(q, (snapshot) => {
+                loadingMessage.classList.add('hidden');
+                if (snapshot.empty) {
+                    ordersList.innerHTML = '<p class="text-center text-gray-500">Nenhum pedido encontrado ainda.</p>';
+                    return;
+                }
+                
+                ordersList.innerHTML = ''; // Limpa a lista antes de renderizar
+                
+                snapshot.forEach((doc) => {
+                    const order = doc.data();
+                    const orderItem = document.createElement('div');
+                    orderItem.className = 'bg-zinc-700 rounded-lg p-4 shadow-md';
+                    
+                    const timestamp = order.timestamp ? new Date(order.timestamp).toLocaleString('pt-BR') : 'Data não disponível';
+                    
+                    orderItem.innerHTML = `
+                        <h3 class="font-bold text-white mb-2">Pedido de ${order.email}</h3>
+                        <p class="text-gray-300 text-sm mb-2">Data: ${timestamp}</p>
+                        <p class="text-gray-400">${order.message}</p>
+                    `;
+                    ordersList.appendChild(orderItem);
+                });
+            }, (error) => {
+                console.error("Erro ao buscar pedidos:", error);
+                loadingMessage.innerText = 'Erro ao carregar pedidos.';
+            });
+        }
+
+        // Lógica para salvar o pedido no Firestore
+        orderForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const message = document.getElementById('message').value;
+
+            if (!db || !email || !message) {
+                orderStatusMessage.innerText = 'Preencha todos os campos obrigatórios.';
+                orderStatusMessage.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                // Adiciona o pedido ao banco de dados
+                await addDoc(collection(db, `artifacts/${appId}/public/data/orders`), {
+                    email: email,
+                    message: message,
+                    timestamp: new Date().toISOString() // Salva a data para ordenação
+                });
+                
+                orderStatusMessage.innerText = 'Pedido enviado com sucesso!';
+                orderStatusMessage.classList.remove('hidden');
+                orderStatusMessage.classList.add('text-green-500');
+                orderForm.reset();
+                console.log("Pedido salvo com sucesso!");
+
+            } catch (e) {
+                console.error("Erro ao adicionar documento:", e);
+                orderStatusMessage.innerText = 'Erro ao enviar pedido. Tente novamente.';
+                orderStatusMessage.classList.remove('hidden');
+                orderStatusMessage.classList.add('text-red-500');
+            }
+        });
+        
         // Lógica de expansão da tabela de serviços
         servicesTable.addEventListener('click', (e) => {
             const row = e.target.closest('tr[data-target]');
@@ -219,12 +420,13 @@
             const arrowIcon = row.querySelector('.arrow');
 
             if (targetElement) {
-                // Alterna a visibilidade da tabela de exemplos
                 targetElement.classList.toggle('hidden');
-                // Alterna a rotação da seta
                 arrowIcon.classList.toggle('rotate-90');
             }
         });
+
+        // Inicia o Firebase no carregamento da página
+        window.onload = initializeFirebase;
     </script>
 </body>
 </html>
