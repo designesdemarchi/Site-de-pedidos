@@ -1,4 +1,4 @@
-
+CTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -263,6 +263,9 @@
 
         // Palavra secreta para a área de admin
         const SECRET_WORD = 'design2025';
+        
+        // Estado da autenticação
+        let isAuthReady = false;
 
         // Função para mostrar uma página e esconder as outras
         function showPage(pageId) {
@@ -286,8 +289,6 @@
 
         // --- Lógica do Admin e do Banco de Dados ---
         
-        let isAuthReady = false;
-
         // Inicializa o Firebase
         function initializeFirebase() {
             try {
@@ -309,6 +310,17 @@
                         }
                         isAuthReady = true;
                     });
+
+                    // Tenta o login com o token personalizado se ele existir
+                    if (initialAuthToken) {
+                        signInWithCustomToken(auth, initialAuthToken).catch(error => {
+                            console.error("Erro ao autenticar com token personalizado, tentando login anônimo:", error);
+                            signInAnonymously(auth);
+                        });
+                    } else {
+                        // Se não houver token, faz login anónimo
+                        signInAnonymously(auth);
+                    }
                 } else {
                     console.error("Firebase config is not available.");
                 }
@@ -318,21 +330,18 @@
         }
 
         // Lógica do botão de palavra secreta
-        secretWordBtn.addEventListener('click', async () => {
+        secretWordBtn.addEventListener('click', () => {
             const enteredWord = secretWordInput.value.trim();
             if (enteredWord === SECRET_WORD) {
-                // Se a palavra estiver correta, espera a autenticação
-                adminMessage.innerText = 'Autenticando...';
-                adminMessage.classList.remove('hidden');
-
-                // Loop para esperar a autenticação ficar pronta
-                while (!isAuthReady) {
-                    await new Promise(resolve => setTimeout(resolve, 100)); // Espera 100ms
+                if (isAuthReady) {
+                    adminMessage.classList.add('hidden');
+                    showPage('ordersListPage');
+                    fetchOrders();
+                } else {
+                    // Esta mensagem agora é apenas um aviso rápido
+                    adminMessage.innerText = 'Autenticando... Por favor, tente novamente em instantes.';
+                    adminMessage.classList.remove('hidden');
                 }
-                
-                adminMessage.classList.add('hidden'); // Esconde a mensagem
-                showPage('ordersListPage');
-                fetchOrders();
             } else {
                 adminMessage.innerText = 'Palavra secreta incorreta.';
                 adminMessage.classList.remove('hidden');
